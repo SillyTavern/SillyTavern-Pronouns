@@ -324,7 +324,7 @@ function createPronounMacroManager({ target = 'persona', getValues = getCurrentP
     ];
     baseMacroDefinitions.forEach(({ name, getter, description, pronounKey }) => {
         if (macros.registry.hasMacro(name)) return;
-        macros.registry.registerMacro(name, getter, description);
+        macros.registry.registerMacro(name, {category: 'legacy', description: description, handler: getter});
         macroByType.get(pronounKey).add(name);
     });
 
@@ -336,7 +336,7 @@ function createPronounMacroManager({ target = 'persona', getValues = getCurrentP
             if (!getter || !description) return;
             names.forEach(name => {
                 if (macros.registry.hasMacro(name)) return;
-                macros.registry.registerMacro(name, getter, description);
+                macros.registry.registerMacro(name, {category: 'legacy', description: description, handler: getter});
                 macroByType.get(pronounKey).add(name);
                 shorthands.add(name);
             });
