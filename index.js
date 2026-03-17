@@ -1,6 +1,6 @@
 import { eventSource, event_types, saveSettingsDebounced, user_avatar } from '../../../../script.js';
 import { power_user } from '../../../../scripts/power-user.js';
-import { MacrosParser } from '../../../../scripts/macros.js';
+import { macros } from '../../../../scripts/macros/macro-system.js';
 import { t } from '../../../../scripts/i18n.js';
 import { extension_settings, renderExtensionTemplateAsync } from '../../../extensions.js';
 import { openPronounReplacePopup } from './replacer.js';
@@ -323,8 +323,8 @@ function createPronounMacroManager({ target = 'persona', getValues = getCurrentP
         { name: 'ref', getter: valueGetters.reflexive, description: descriptions.reflexive, pronounKey: 'reflexive' },
     ];
     baseMacroDefinitions.forEach(({ name, getter, description, pronounKey }) => {
-        if (MacrosParser.has(name)) return;
-        MacrosParser.registerMacro(name, getter, description);
+        if (macros.registry.hasMacro(name)) return;
+        macros.registry.registerMacro(name, getter, description);
         macroByType.get(pronounKey).add(name);
     });
 
@@ -335,8 +335,8 @@ function createPronounMacroManager({ target = 'persona', getValues = getCurrentP
             const description = descriptions[descriptionKey];
             if (!getter || !description) return;
             names.forEach(name => {
-                if (MacrosParser.has(name)) return;
-                MacrosParser.registerMacro(name, getter, description);
+                if (macros.registry.hasMacro(name)) return;
+                macros.registry.registerMacro(name, getter, description);
                 macroByType.get(pronounKey).add(name);
                 shorthands.add(name);
             });
@@ -348,7 +348,7 @@ function createPronounMacroManager({ target = 'persona', getValues = getCurrentP
         for (const name of shorthands) {
             for (const [, macros] of macroByType.entries()) {
                 if (!macros.has(name)) continue;
-                MacrosParser.unregisterMacro(name);
+                macros.registry.unregisterMacro(name);
                 macros.delete(name);
                 shorthands.delete(name);
             }
