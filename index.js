@@ -311,11 +311,11 @@ function createPronounMacroManager({ target = 'persona', getValues = getCurrentP
     const subName = target === 'persona' ? '' : `${target}.`;
 
     const baseMacroDefinitions = [
-        { name: `pronoun.${subName}subjective`, getter: valueGetters.subjective, description: descriptions.subjective, pronounKey: 'subjective' },
-        { name: `pronoun.${subName}objective`, getter: valueGetters.objective, description: descriptions.objective, pronounKey: 'objective' },
-        { name: `pronoun.${subName}pos_det`, getter: valueGetters.posDet, description: descriptions.pos_det, pronounKey: 'posDet' },
-        { name: `pronoun.${subName}pos_pro`, getter: valueGetters.posPro, description: descriptions.pos_pro, pronounKey: 'posPro' },
-        { name: `pronoun.${subName}reflexive`, getter: valueGetters.reflexive, description: descriptions.reflexive, pronounKey: 'reflexive' },
+        { name: `pronoun-${subName}subjective`, getter: valueGetters.subjective, description: descriptions.subjective, pronounKey: 'subjective' },
+        { name: `pronoun-${subName}objective`, getter: valueGetters.objective, description: descriptions.objective, pronounKey: 'objective' },
+        { name: `pronoun-${subName}pos_det`, getter: valueGetters.posDet, description: descriptions.pos_det, pronounKey: 'posDet' },
+        { name: `pronoun-${subName}pos_pro`, getter: valueGetters.posPro, description: descriptions.pos_pro, pronounKey: 'posPro' },
+        { name: `pronoun-${subName}reflexive`, getter: valueGetters.reflexive, description: descriptions.reflexive, pronounKey: 'reflexive' },
         { name: 'sub', getter: valueGetters.subjective, description: descriptions.subjective, pronounKey: 'subjective' },
         { name: 'obj', getter: valueGetters.objective, description: descriptions.objective, pronounKey: 'objective' },
         { name: 'poss', getter: valueGetters.posDet, description: descriptions.pos_det, pronounKey: 'posDet' },

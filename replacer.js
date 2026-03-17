@@ -88,7 +88,7 @@ export function replacePronounsWithMacros(text, { useShorthands = false, pronoun
         }
         if (!macroName) {
             const macroKey = key === 'posDet' ? 'pos_det' : key === 'posPro' ? 'pos_pro' : key;
-            macroName = `pronoun.${macroKey}`;
+            macroName = `pronoun-${macroKey}`;
         }
         lowerWordToMacro.set(lower, `{{${macroName}}}`);
     }
@@ -205,7 +205,7 @@ export async function openPronounReplacePopup(initialText = null, { defaultUseSh
             const value = String(pronouns[key] ?? '').trim();
             if (!value) return null;
             const macroKey = key === 'posDet' ? 'pos_det' : key === 'posPro' ? 'pos_pro' : key;
-            const baseMacro = `{{pronoun.${macroKey}}}`;
+            const baseMacro = `{{pronoun-${macroKey}}}`;
             return { key, label, value, macro: baseMacro };
         }).filter(Boolean);
 
