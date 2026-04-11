@@ -53,7 +53,6 @@ function resolveShorthandsArg(argValue) {
 export function registerSlashCommands() {
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
         name: 'pronouns-open-replacer',
-        isThirdParty: true,
         returns: 'The converted text after the user confirms, or an empty string if cancelled or no pronouns are set.',
         namedArgumentList: [
             SlashCommandNamedArgument.fromProps({
@@ -108,7 +107,6 @@ export function registerSlashCommands() {
 
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
         name: 'pronouns-replace',
-        isThirdParty: true,
         returns: 'The input text with all matching pronoun words replaced by their macro equivalents.',
         namedArgumentList: [
             SlashCommandNamedArgument.fromProps({
@@ -188,7 +186,6 @@ export function registerSlashCommands() {
 
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
         name: 'pronouns-set-preset',
-        isThirdParty: true,
         returns: 'The applied preset key, or an empty string if the preset was not found.',
         unnamedArgumentList: [
             SlashCommandArgument.fromProps({
@@ -232,7 +229,6 @@ export function registerSlashCommands() {
 
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
         name: 'pronouns-set',
-        isThirdParty: true,
         returns: 'The updated pronoun value, or an empty string if the key was invalid.',
         namedArgumentList: [
             SlashCommandNamedArgument.fromProps({

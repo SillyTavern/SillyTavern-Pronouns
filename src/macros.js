@@ -163,7 +163,6 @@ function createPronounMacroManager() {
                 registeredSet.add(name);
             }
         }
-
     }
 
     /**
