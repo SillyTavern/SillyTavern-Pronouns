@@ -43,7 +43,7 @@ function getPrimaryMacroName(key) {
         posPro: 'pronounPosPro',
         reflexive: 'pronounReflexive',
     };
-    return map[key] ?? `pronounSubjective`;
+    return map[key] ?? 'pronounSubjective';
 }
 
 /**
