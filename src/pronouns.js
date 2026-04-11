@@ -70,12 +70,25 @@ const defaultSettings = Object.freeze({
 });
 
 /**
- * Ensures extension settings exist with defaults.
+ * Migrates settings from v1 to v2 if needed.
+ * - v1 had a single `enablePersonaShorthands` key which mapped to WyvernChat shorthands.
+ * @param {Record<string, unknown>} settings
+ */
+function migrateSettings(settings) {
+    if ('enablePersonaShorthands' in settings && !(settingKeys.ENABLE_WYVERN_SHORTHANDS in settings)) {
+        settings[settingKeys.ENABLE_WYVERN_SHORTHANDS] = settings['enablePersonaShorthands'];
+        delete settings['enablePersonaShorthands'];
+    }
+}
+
+/**
+ * Ensures extension settings exist with defaults, running any needed migrations.
  * @returns {Record<string, unknown>}
  */
 export function ensureSettings() {
     extension_settings[EXTENSION_KEY] = extension_settings[EXTENSION_KEY] || {};
     const settings = extension_settings[EXTENSION_KEY];
+    migrateSettings(settings);
     for (const [key, value] of Object.entries(defaultSettings)) {
         if (!(key in settings)) settings[key] = value;
     }

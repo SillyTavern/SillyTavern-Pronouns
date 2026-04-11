@@ -43,6 +43,7 @@ Pronouns are available as macros anywhere SillyTavern supports macro substitutio
 | `{{pronoun-pos-det}}` | Possessive determiner | her / his / their |
 | `{{pronoun-pos-pro}}` | Possessive pronoun | hers / his / theirs |
 | `{{pronoun-reflexive}}` | Reflexive | herself / himself / themselves |
+| `{{pronoun-verb-be}}` | Verb-be agreement | is / are |
 
 **WyvernChat shorthand aliases** (opt-in, see [Settings](#settings)):
 
@@ -53,6 +54,7 @@ Pronouns are available as macros anywhere SillyTavern supports macro substitutio
 | `{{her_}}` `{{his_}}` `{{their_}}` | Possessive determiner (trailing `_` avoids collision) |
 | `{{hers}}` `{{his}}` `{{theirs}}` | Possessive pronoun |
 | `{{herself}}` `{{himself}}` `{{themself}}` | Reflexive |
+| `{{they_re}}` | Subjective + verb-be contraction ("she's", "he's", "they're") |
 
 **JanitorAI shorthand aliases** (opt-in, see [Settings](#settings)):
 
@@ -83,7 +85,7 @@ Paste any prompt or character card text and the tool automatically swaps matchin
 
 Access the extension settings under **Extensions → Pronouns** in the SillyTavern settings panel.
 
-- **Enable WyvernChat shorthand macros** — Registers `{{she}}`, `{{him}}`, `{{their_}}`, etc. as additional aliases. Disabled by default to keep the macro list clean.
+- **Enable WyvernChat shorthand macros** — Registers `{{she}}`, `{{him}}`, `{{their_}}`, `{{they_re}}`, etc. as additional aliases. Disabled by default to keep the macro list clean.
 - **Enable JanitorAI shorthand macros** — Registers `{{sub}}`, `{{obj}}`, `{{poss}}`, etc. as additional aliases. Disabled by default.
 
 ### Terminology
@@ -107,7 +109,8 @@ For more information, see [pronouns.org](https://pronouns.org/) or [Wikipedia](h
 - [x] JanitorAI shorthand macros behind opt-in toggle
 - [x] Pronoun text replacer popup
 - [x] Slash commands for pronoun management and direct text replacement
-- [ ] Add `{{pronoun-verb-be}}` macro ("is"/"are") for verb agreement — e.g., `{{They}} {{pronoun-verb-be}} a student`
+- [x] Add `{{pronoun-verb-be}}` macro ("is"/"are") for verb agreement — e.g., `{{They}} {{pronoun-verb-be}} a student`
+- [x] Add `{{they_re}}` WyvernChat contraction shorthand ("she's"/"he's"/"they're")
 - [ ] Add support for character pronouns (in addition to persona pronouns)
 - [ ] Shorthands in other languages?
 - [ ] add rainbows
