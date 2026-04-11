@@ -5,12 +5,12 @@
  *  - Primary (always on):  {{pronounSubjective}}, {{pronounObjective}},
  *                          {{pronounPosDet}}, {{pronounPosPro}}, {{pronounReflexive}},
  *                          {{pronounVerbBe}} ("is"/"are")
- *    These names match WyvernChat's pronoun placeholder names exactly.
  *    Dot-notation aliases ({{pronoun.subjective}} etc.) are rewritten to these via a pre-processor.
  *  - Shorthand aliases (opt-in toggle): {{she}}/{{he}}/{{they}}, {{her}}/{{him}}/{{them}},
  *                          {{her_}}/{{his_}}/{{their_}}, {{hers}}/{{his}}/{{theirs}},
  *                          {{herself}}/{{himself}}/{{themself}}
- *  - JanitorAI aliases (opt-in toggle): {{sub}}, {{obj}}, {{pos}}, {{poss_p}}, {{ref}}
+ *  - WyvernChat compat (opt-in toggle): {{pronounSubjectiveCap}}, {{pronounObjectiveCap}}, etc.
+ *  - JanitorAI compat (opt-in toggle): {{sub}}, {{obj}}, {{pos}}, {{poss_p}}, {{ref}}
  */
 
 import { macros } from '../../../../../scripts/macros/macro-system.js';
