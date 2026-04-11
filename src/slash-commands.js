@@ -1,24 +1,36 @@
-import { SlashCommand } from '../../../slash-commands/SlashCommand.js';
-import { SlashCommandNamedArgument, ARGUMENT_TYPE, SlashCommandArgument } from '../../../slash-commands/SlashCommandArgument.js';
-import { SlashCommandEnumValue, enumTypes } from '../../../slash-commands/SlashCommandEnumValue.js';
-import { SlashCommandParser } from '../../../slash-commands/SlashCommandParser.js';
+/**
+ * Slash command registrations for the Pronouns extension.
+ */
+
+import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
+import { SlashCommandNamedArgument, ARGUMENT_TYPE, SlashCommandArgument } from '../../../../slash-commands/SlashCommandArgument.js';
+import { SlashCommandEnumValue, enumTypes } from '../../../../slash-commands/SlashCommandEnumValue.js';
+import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParser.js';
+import { commonEnumProviders } from '../../../../slash-commands/SlashCommandCommonEnumsProvider.js';
+import { isTrueBoolean } from '../../../../utils.js';
 import { openPronounReplacePopup, replacePronounsWithMacros } from './replacer.js';
-import { pronounPresets, getCurrentPronounValues, setCurrentPersonaPronounsPreset, setCurrentPersonaPronounValue, getPersonaShorthandSetting } from './index.js';
-import { commonEnumProviders } from '../../../slash-commands/SlashCommandCommonEnumsProvider.js';
-import { isTrueBoolean } from '../../../utils.js';
+import { pronounPresets, getCurrentPronounValues, applyPronounPreset, setCurrentPronounValue, pronounsSettings } from './pronouns.js';
 
-const pronounsEnums = {
-    presets: () => Object.keys(pronounPresets).map(k => new SlashCommandEnumValue(k, `${pronounPresets[k].subjective}/${pronounPresets[k].objective}/...`, enumTypes.enum)),
-    keys: [
-        new SlashCommandEnumValue('subjective', 'Subjective pronoun', enumTypes.enum, 'S'),
-        new SlashCommandEnumValue('objective', 'Objective pronoun', enumTypes.enum, 'O'),
-        new SlashCommandEnumValue('posDet', 'Possessive determiner', enumTypes.enum, 'PD'),
-        new SlashCommandEnumValue('posPro', 'Possessive pronoun', enumTypes.enum, 'PP'),
-        new SlashCommandEnumValue('reflexive', 'Reflexive pronoun', enumTypes.enum, 'R'),
-    ],
-};
+const pronounKeyEnums = [
+    new SlashCommandEnumValue('subjective', 'Subjective pronoun', enumTypes.enum, 'S'),
+    new SlashCommandEnumValue('objective', 'Objective pronoun', enumTypes.enum, 'O'),
+    new SlashCommandEnumValue('posDet', 'Possessive determiner', enumTypes.enum, 'PD'),
+    new SlashCommandEnumValue('posPro', 'Possessive pronoun', enumTypes.enum, 'PP'),
+    new SlashCommandEnumValue('reflexive', 'Reflexive pronoun', enumTypes.enum, 'R'),
+];
 
-export function registerPronounsSlashCommands() {
+/** @returns {SlashCommandEnumValue[]} */
+function getPresetEnums() {
+    return Object.keys(pronounPresets).map(k =>
+        new SlashCommandEnumValue(k, `${pronounPresets[k].subjective}/${pronounPresets[k].objective}/...`, enumTypes.enum),
+    );
+}
+
+/**
+ * Registers all pronoun slash commands.
+ */
+export function registerSlashCommands() {
+    // /pronouns-open-replacer [shorthands=true] [text]
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
         name: 'pronouns-open-replacer',
         returns: 'replaced text or empty string',
@@ -29,7 +41,7 @@ export function registerPronounsSlashCommands() {
                 typeList: [ARGUMENT_TYPE.BOOLEAN],
                 enumList: commonEnumProviders.boolean('trueFalse')(),
                 forceEnum: true,
-                defaultValue: getPersonaShorthandSetting() ? 'true' : 'false',
+                defaultValue: pronounsSettings.wyvernShorthands ? 'true' : 'false',
             }),
         ],
         unnamedArgumentList: [
@@ -41,8 +53,7 @@ export function registerPronounsSlashCommands() {
         callback: async (args, text = '') => {
             try {
                 const useSh = typeof args.shorthands === 'string' ? isTrueBoolean(args.shorthands) : true;
-                const result = await openPronounReplacePopup(String(text ?? ''), { defaultUseShorthands: useSh });
-                return result || '';
+                return await openPronounReplacePopup(String(text ?? ''), { defaultUseShorthands: useSh }) ?? '';
             } catch (error) {
                 toastr.error(String(error?.message ?? error), 'Pronouns');
                 return '';
@@ -50,23 +61,24 @@ export function registerPronounsSlashCommands() {
         },
     }));
 
+    // /pronouns-replace [shorthands=true] [preset=...] [subjective=...] ... text
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
         name: 'pronouns-replace',
         returns: 'replaced text',
         namedArgumentList: [
             SlashCommandNamedArgument.fromProps({
                 name: 'shorthands',
-                description: 'Whether shorthand macros should be used if available',
+                description: 'Whether WyvernChat shorthand macros should be used if available',
                 typeList: [ARGUMENT_TYPE.BOOLEAN],
                 enumList: commonEnumProviders.boolean('trueFalse')(),
                 forceEnum: true,
-                defaultValue: getPersonaShorthandSetting() ? 'true' : 'false',
+                defaultValue: pronounsSettings.wyvernShorthands ? 'true' : 'false',
             }),
             SlashCommandNamedArgument.fromProps({
                 name: 'preset',
                 description: 'Pronoun preset to use',
                 typeList: [ARGUMENT_TYPE.STRING],
-                enumList: pronounsEnums.presets(),
+                enumList: getPresetEnums(),
                 forceEnum: true,
             }),
             SlashCommandNamedArgument.fromProps({ name: 'subjective', description: 'Subjective pronoun', typeList: [ARGUMENT_TYPE.STRING] }),
@@ -85,15 +97,11 @@ export function registerPronounsSlashCommands() {
             try {
                 const useSh = typeof args.shorthands === 'string' ? isTrueBoolean(args.shorthands) : true;
                 const presetKey = typeof args.preset === 'string' ? args.preset : null;
-                let pronouns = null;
-                if (presetKey && pronounPresets[presetKey]) pronouns = { ...pronounPresets[presetKey] };
-                pronouns = pronouns ?? { ...getCurrentPronounValues() };
-                const keys = ['subjective', 'objective', 'posDet', 'posPro', 'reflexive'];
-                for (const k of keys) {
+                let pronouns = presetKey && pronounPresets[presetKey] ? { ...pronounPresets[presetKey] } : { ...getCurrentPronounValues() };
+                for (const k of ['subjective', 'objective', 'posDet', 'posPro', 'reflexive']) {
                     if (typeof args[k] === 'string') pronouns[k] = args[k];
                 }
-                const result = replacePronounsWithMacros(String(text ?? ''), { useShorthands: useSh, pronouns });
-                return result || '';
+                return replacePronounsWithMacros(String(text ?? ''), { useWyvernShorthands: useSh, pronouns }) || '';
             } catch (error) {
                 toastr.error(String(error?.message ?? error), 'Pronouns');
                 return '';
@@ -101,6 +109,7 @@ export function registerPronounsSlashCommands() {
         },
     }));
 
+    // /pronouns-set-preset presetKey
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
         name: 'pronouns-set-preset',
         returns: 'applied preset key',
@@ -108,7 +117,7 @@ export function registerPronounsSlashCommands() {
             SlashCommandArgument.fromProps({
                 description: 'Pronoun preset key',
                 typeList: [ARGUMENT_TYPE.STRING],
-                enumList: pronounsEnums.presets(),
+                enumList: getPresetEnums(),
                 forceEnum: true,
                 isRequired: true,
             }),
@@ -117,7 +126,7 @@ export function registerPronounsSlashCommands() {
             try {
                 const key = String(presetName ?? '').trim();
                 if (!key || !pronounPresets[key]) return '';
-                setCurrentPersonaPronounsPreset(key);
+                applyPronounPreset(key);
                 return key;
             } catch (error) {
                 toastr.error(String(error?.message ?? error), 'Pronouns');
@@ -126,6 +135,7 @@ export function registerPronounsSlashCommands() {
         },
     }));
 
+    // /pronouns-set key=... value
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
         name: 'pronouns-set',
         returns: 'updated pronoun value',
@@ -134,8 +144,9 @@ export function registerPronounsSlashCommands() {
                 name: 'key',
                 description: 'Pronoun key to set',
                 typeList: [ARGUMENT_TYPE.STRING],
-                enumList: pronounsEnums.keys,
+                enumList: pronounKeyEnums,
                 forceEnum: true,
+                isRequired: true,
             }),
         ],
         unnamedArgumentList: [
@@ -149,7 +160,7 @@ export function registerPronounsSlashCommands() {
                 const key = String(args.key ?? '').trim();
                 const val = String(value ?? '');
                 if (!key) return '';
-                return setCurrentPersonaPronounValue(key, val) ?? '';
+                return setCurrentPronounValue(key, val) ?? '';
             } catch (error) {
                 toastr.error(String(error?.message ?? error), 'Pronouns');
                 return '';

@@ -1,18 +1,18 @@
 /* Pronoun settings UI */
-.persona_pronoun_settings_container {
+.pronoun-settings-container {
     margin: 10px 0;
 }
 
-.persona_pronoun_settings_container .flex-container {
+.pronoun-settings-container .flex-container {
     gap: 10px;
 }
 
-.pronoun_preset_buttons {
+.pronoun-preset-buttons {
     gap: 10px;
     flex-wrap: wrap;
 }
 
-.pronoun_preset_buttons .menu_button {
+.pronoun-preset-buttons .menu_button {
     min-width: 90px;
     padding: 3px 4px;
     text-align: center;
