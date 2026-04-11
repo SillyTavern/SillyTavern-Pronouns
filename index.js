@@ -18,8 +18,7 @@ export async function init() {
 
     console.debug(`[${EXTENSION_NAME}] Initializing...`);
 
-    const manifestUrl = new URL('./manifest.json', import.meta.url).href;
-    const version = await fetch(manifestUrl).then(r => r.json()).then(m => m.version).catch(() => null);
+    const version = SillyTavern.getContext().getExtensionManifest?.(EXTENSION_NAME)?.version ?? null;
     ensureSettings(version);
 
     await injectUI();
