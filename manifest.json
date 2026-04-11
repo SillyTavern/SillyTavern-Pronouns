@@ -1,11 +1,14 @@
 {
-    "display_name": "Persona Pronouns",
+    "display_name": "Pronouns",
     "loading_order": 42,
     "requires": [],
     "optional": [],
     "js": "index.js",
     "css": "style.css",
     "author": "Wolfsblvt",
-    "version": "1.0.0",
-    "homePage": "https://github.com/Wolfsblvt/SillyTavern-Pronouns"
+    "version": "2.0.0",
+    "homePage": "https://github.com/Wolfsblvt/SillyTavern-Pronouns",
+    "hooks": {
+        "activate": "init"
+    }
 }
