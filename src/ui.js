@@ -123,7 +123,7 @@ function onWyvernCompatToggleChange(event) {
 
 function onJanitorToggleChange(event) {
     const enabled = $(event.currentTarget).is(':checked');
-    saveSetting(settingKeys.ENABLE_JANITOR_SHORTHANDS, enabled);
+    saveSetting(settingKeys.ENABLE_JANITOR_COMPAT, enabled);
     getMacroManager().janitorAliases.set(enabled);
     updatePronounTooltips();
 }
@@ -171,7 +171,7 @@ async function injectSettingsUI() {
         .on('change', onWyvernCompatToggleChange);
 
     $('#pronouns_enable_janitor_shorthands')
-        .prop('checked', pronounsSettings.janitorShorthands)
+        .prop('checked', pronounsSettings.janitorCompat)
         .on('change', onJanitorToggleChange);
 }
 

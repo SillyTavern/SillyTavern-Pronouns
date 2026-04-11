@@ -15,7 +15,7 @@
 
 import { macros } from '../../../../../scripts/macros/macro-system.js';
 import { t } from '../../../../../scripts/i18n.js';
-import { getCurrentPronounValues, shorthandAliases, wyvernCapMacros, janitorShorthandAliases, pronounsSettings } from './pronouns.js';
+import { getCurrentPronounValues, shorthandAliases, wyvernChatAliases, JanitorAIAliases, pronounsSettings } from './pronouns.js';
 
 /**
  * Rewrites WyvernChat dot-notation pronoun placeholders to our camelCase macro names.
@@ -171,7 +171,7 @@ function createPronounMacroManager() {
      * @param {Set<string>} registeredSet
      */
     function enableWyvernCompatGroup(registeredSet) {
-        for (const { pronounKey, name } of wyvernCapMacros) {
+        for (const { pronounKey, name } of wyvernChatAliases) {
             if (macros.registry.hasMacro(name)) continue;
             const getter = valueGetters[pronounKey];
             macros.registry.registerMacro(name, {
@@ -224,10 +224,10 @@ function createPronounMacroManager() {
             set: (enabled) => enabled ? enableWyvernCompatGroup(wyvernCompatRegistered) : disableAliasGroup(wyvernCompatRegistered),
         },
         janitorAliases: {
-            enable: () => enableAliasGroup(janitorShorthandAliases, janitorRegistered),
+            enable: () => enableAliasGroup(JanitorAIAliases, janitorRegistered),
             disable: () => disableAliasGroup(janitorRegistered),
-            toggle: () => janitorRegistered.size > 0 ? disableAliasGroup(janitorRegistered) : enableAliasGroup(janitorShorthandAliases, janitorRegistered),
-            set: (enabled) => setAliasGroup(janitorRegistered, janitorShorthandAliases, enabled),
+            toggle: () => janitorRegistered.size > 0 ? disableAliasGroup(janitorRegistered) : enableAliasGroup(JanitorAIAliases, janitorRegistered),
+            set: (enabled) => setAliasGroup(janitorRegistered, JanitorAIAliases, enabled),
         },
         getRegistered: () => Array.from(macrosByType.values()).flatMap(s => Array.from(s)),
         getRegisteredByType: () => ({
@@ -248,5 +248,5 @@ export function applyMacroSettings() {
     const m = getMacroManager();
     m.shorthands.set(pronounsSettings.shorthands);
     m.wyvernCompat.set(pronounsSettings.wyvernCompat);
-    m.janitorAliases.set(pronounsSettings.janitorShorthands);
+    m.janitorAliases.set(pronounsSettings.janitorCompat);
 }

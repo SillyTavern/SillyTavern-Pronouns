@@ -52,7 +52,7 @@ export const shorthandAliases = Object.freeze([
  * We implement them as separate handlers (not aliases) since they transform the value.
  */
 /** @type {ReadonlyArray<{pronounKey: 'subjective'|'objective'|'posDet'|'posPro'|'reflexive', name: string}>} */
-export const wyvernCapMacros = Object.freeze([
+export const wyvernChatAliases = Object.freeze([
     { pronounKey: 'subjective', name: 'pronounSubjectiveCap' },
     { pronounKey: 'objective', name: 'pronounObjectiveCap' },
     { pronounKey: 'posDet', name: 'pronounPosDetCap' },
@@ -61,12 +61,12 @@ export const wyvernCapMacros = Object.freeze([
 ]);
 
 /**
- * JanitorAI-style shorthands.
+ * JanitorAI compatibility aliases.
  * Names confirmed from JanitorAI UI: sub, obj, pos, poss_p, ref.
  * Note: possessive determiner is {{pos}} (not {{poss}}) on JanitorAI.
  */
 /** @type {ReadonlyArray<PronounShorthandAlias>} */
-export const janitorShorthandAliases = Object.freeze([
+export const JanitorAIAliases = Object.freeze([
     { pronounKey: 'subjective', names: ['sub'] },
     { pronounKey: 'objective', names: ['obj'] },
     { pronounKey: 'posDet', names: ['pos'] },
@@ -79,46 +79,56 @@ export const janitorShorthandAliases = Object.freeze([
 // ---------------------------------------------------------------------------
 
 export const settingKeys = Object.freeze({
+    CUR_VERSION: '_curVersion',
     ENABLE_SHORTHANDS: 'enableShorthands',
     ENABLE_WYVERN_COMPAT: 'enableWyvernCompat',
-    ENABLE_JANITOR_SHORTHANDS: 'enableJanitorShorthands',
+    ENABLE_JANITOR_COMPAT: 'enableJanitorCompat',
 });
 
 const defaultSettings = Object.freeze({
+    [settingKeys.CUR_VERSION]: null,
     [settingKeys.ENABLE_SHORTHANDS]: false,
     [settingKeys.ENABLE_WYVERN_COMPAT]: false,
-    [settingKeys.ENABLE_JANITOR_SHORTHANDS]: false,
+    [settingKeys.ENABLE_JANITOR_COMPAT]: false,
 });
 
 /**
  * Migrates settings from older versions if needed.
- * - v1 had a single `enablePersonaShorthands` key.
- * - v2.0 used `enableWyvernShorthands`.
- * Both map to the current `enableShorthands` key.
+ * Uses `_curVersion` if present to guard future version-specific migrations.
  * @param {Record<string, unknown>} settings
  */
 function migrateSettings(settings) {
+    // v1: single enablePersonaShorthands key
     if ('enablePersonaShorthands' in settings && !(settingKeys.ENABLE_SHORTHANDS in settings)) {
         settings[settingKeys.ENABLE_SHORTHANDS] = settings['enablePersonaShorthands'];
         delete settings['enablePersonaShorthands'];
     }
+    // v2.0: enableWyvernShorthands key
     if ('enableWyvernShorthands' in settings && !(settingKeys.ENABLE_SHORTHANDS in settings)) {
         settings[settingKeys.ENABLE_SHORTHANDS] = settings['enableWyvernShorthands'];
         delete settings['enableWyvernShorthands'];
+    }
+    // v2.0: enableJanitorShorthands renamed to enableJanitorCompat
+    if ('enableJanitorShorthands' in settings && !(settingKeys.ENABLE_JANITOR_COMPAT in settings)) {
+        settings[settingKeys.ENABLE_JANITOR_COMPAT] = settings['enableJanitorShorthands'];
+        delete settings['enableJanitorShorthands'];
     }
 }
 
 /**
  * Ensures extension settings exist with defaults, running any needed migrations.
+ * Stamps `_curVersion` with the running extension version so future migrations can gate on it.
+ * @param {string|null} [version=null] - Current extension version from manifest.json
  * @returns {Record<string, unknown>}
  */
-export function ensureSettings() {
+export function ensureSettings(version = null) {
     extension_settings[EXTENSION_KEY] = extension_settings[EXTENSION_KEY] || {};
     const settings = extension_settings[EXTENSION_KEY];
     migrateSettings(settings);
     for (const [key, value] of Object.entries(defaultSettings)) {
         if (!(key in settings)) settings[key] = value;
     }
+    if (version !== null) settings[settingKeys.CUR_VERSION] = version;
     return settings;
 }
 
@@ -129,8 +139,8 @@ export const pronounsSettings = {
     get wyvernCompat() {
         return Boolean(ensureSettings()[settingKeys.ENABLE_WYVERN_COMPAT]);
     },
-    get janitorShorthands() {
-        return Boolean(ensureSettings()[settingKeys.ENABLE_JANITOR_SHORTHANDS]);
+    get janitorCompat() {
+        return Boolean(ensureSettings()[settingKeys.ENABLE_JANITOR_COMPAT]);
     },
 };
 
