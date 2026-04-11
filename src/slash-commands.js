@@ -97,6 +97,7 @@ export function registerSlashCommands() {
         callback: async (args, text = '') => {
             try {
                 const useSh = resolveShorthandsArg(typeof args.shorthands === 'string' ? args.shorthands : undefined);
+                if (useSh === null) return '';
                 return await openPronounReplacePopup(String(text ?? ''), { defaultUseShorthands: useSh ?? false }) ?? '';
             } catch (error) {
                 toastr.error(String(error?.message ?? error), 'Pronouns');
