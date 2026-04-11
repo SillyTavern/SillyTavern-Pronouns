@@ -67,10 +67,10 @@ Paste any prompt or character card text and the tool automatically swaps matchin
 
 | Command | Description |
 |---|---|
-| `/pronouns-set key=<key> <value>` | Set a single pronoun field for the current persona |
-| `/pronouns-set-preset <preset>` | Apply a preset (`she`, `he`, `they`, `it`) to the current persona |
-| `/pronouns-replace [shorthands=true] [preset=...] [subjective=...] <text>` | Replace pronouns in text with macros |
-| `/pronouns-open-replacer [shorthands=true] [text]` | Open the pronoun replacer popup |
+| `/pronouns-set key=<key> <value>` | Set a single pronoun field for the active persona. Keys: `subjective`, `objective`, `posDet`, `posPro`, `reflexive`. |
+| `/pronouns-set-preset <preset>` | Apply a preset to the active persona. Presets: `she`, `he`, `they`, `it`. |
+| `/pronouns-replace [shorthands] [preset=...] [subjective=...] ... <text>` | Replace pronoun words in text with macros. Uses active persona's pronouns by default. `shorthands` defaults to the global setting. |
+| `/pronouns-open-replacer [shorthands] [text]` | Open the pronoun replacer popup. Optionally prefill with text; otherwise uses clipboard. |
 
 ### Settings
 
