@@ -3,12 +3,7 @@
     margin: 10px 0;
 }
 
-.pronoun-settings-container .flex-container {
-    gap: 10px;
-}
-
 .pronoun-preset-buttons {
-    gap: 10px;
     flex-wrap: wrap;
 }
 
@@ -20,6 +15,7 @@
 }
 
 #pronouns_open_replacer {
+    margin-left: 10px;
     width: auto;
 }
 
