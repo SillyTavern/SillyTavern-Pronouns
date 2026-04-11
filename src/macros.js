@@ -2,39 +2,66 @@
  * Macro registration and management for the Pronouns extension.
  *
  * Macro naming convention:
- *  - Primary (always on):  {{pronoun-subjective}}, {{pronoun-objective}},
- *                          {{pronoun-pos-det}}, {{pronoun-pos-pro}}, {{pronoun-reflexive}},
- *                          {{pronoun-verb-be}} ("is"/"are")
- *  - WyvernChat aliases (opt-in toggle): {{she}}/{{he}}/{{they}}, {{her}}/{{him}}/{{them}},
+ *  - Primary (always on):  {{pronounSubjective}}, {{pronounObjective}},
+ *                          {{pronounPosDet}}, {{pronounPosPro}}, {{pronounReflexive}},
+ *                          {{pronounVerbBe}} ("is"/"are")
+ *    These names match WyvernChat's pronoun placeholder names exactly.
+ *    Dot-notation aliases ({{pronoun.subjective}} etc.) are rewritten to these via a pre-processor.
+ *  - Shorthand aliases (opt-in toggle): {{she}}/{{he}}/{{they}}, {{her}}/{{him}}/{{them}},
  *                          {{her_}}/{{his_}}/{{their_}}, {{hers}}/{{his}}/{{theirs}},
- *                          {{herself}}/{{himself}}/{{themself}},
- *                          {{they_re}} (generic contraction: "she's", "he's", "they're" based on current subjective)
- *  - JanitorAI aliases (opt-in toggle): {{sub}}, {{obj}}, {{poss}}, {{poss_p}}, {{ref}}
+ *                          {{herself}}/{{himself}}/{{themself}}
+ *  - JanitorAI aliases (opt-in toggle): {{sub}}, {{obj}}, {{pos}}, {{poss_p}}, {{ref}}
  */
 
 import { macros } from '../../../../../scripts/macros/macro-system.js';
 import { t } from '../../../../../scripts/i18n.js';
-import { getCurrentPronounValues, wyvernShorthandAliases, janitorShorthandAliases, pronounsSettings, pronounPresets } from './pronouns.js';
+import { getCurrentPronounValues, shorthandAliases, janitorShorthandAliases, pronounsSettings } from './pronouns.js';
+
+/**
+ * Rewrites WyvernChat dot-notation pronoun placeholders to our camelCase macro names.
+ * This runs as a pre-processor so the macros engine sees the canonical names.
+ * e.g. {{pronoun.subjective}} => {{pronounSubjective}}
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+function rewriteDotNotation(text) {
+    return text
+        .replace(/{{pronoun\.subjective}}/gi, '{{pronounSubjective}}')
+        .replace(/{{pronoun\.objective}}/gi, '{{pronounObjective}}')
+        .replace(/{{pronoun\.pos_det}}/gi, '{{pronounPosDet}}')
+        .replace(/{{pronoun\.pos_pro}}/gi, '{{pronounPosPro}}')
+        .replace(/{{pronoun\.reflexive}}/gi, '{{pronounReflexive}}');
+}
+
+/**
+ * Registers the dot-notation pre-processor. Called once during init.
+ */
+export function registerPreProcessors() {
+    macros.engine.addPreProcessor(rewriteDotNotation, { priority: 45, source: 'extension:sillytavern-pronouns' });
+}
 
 /**
  * Derives the verb-be form ("is"/"are") from the current subjective pronoun.
- * "they" -> "are", everything else -> "is".
+ * Matches common English plural/they-form pronouns; everything else gets "is".
+ * Non-English custom pronouns: users can still benefit if their language uses the same logic,
+ * but this is inherently English-centric.
  * @returns {string}
  */
 function getVerbBe() {
     const subjective = getCurrentPronounValues().subjective.toLowerCase().trim();
     if (!subjective) return '';
     // Plural/they-form pronouns use "are"; singular use "is"
-    const areForms = new Set(['they', 'we', 'you', pronounPresets.they.subjective.toLowerCase()]);
+    const areForms = new Set(['they', 'we', 'you', 'they/them']);
     return areForms.has(subjective) ? 'are' : 'is';
 }
 
 /**
  * @typedef {Object} PronounMacroManager
- * @property {{ toggle: () => void, set: (enabled: boolean) => void, enable: () => void, disable: () => void }} wyvernAliases
- * @property {{ toggle: () => void, set: (enabled: boolean) => void, enable: () => void, disable: () => void }} janitorAliases
  * @property {() => string[]} getRegistered
  * @property {() => { subjective: string[]; objective: string[]; posDet: string[]; posPro: string[]; reflexive: string[]; verbBe: string[] }} getRegisteredByType
+ * @property {{ toggle: () => void, set: (enabled: boolean) => void, enable: () => void, disable: () => void }} shorthands
+ * @property {{ toggle: () => void, set: (enabled: boolean) => void, enable: () => void, disable: () => void }} janitorAliases
  */
 
 /** @type {PronounMacroManager | null} */
@@ -61,7 +88,7 @@ function createPronounMacroManager() {
         posDet: t`Possessive determiner (her/his/their)`,
         posPro: t`Possessive pronoun (hers/his/theirs)`,
         reflexive: t`Reflexive pronoun (herself/himself/themselves)`,
-        verbBe: t`Verb-be form derived from subjective pronoun ("is" or "are")`,
+        verbBe: t`Verb-be agreement derived from the subjective pronoun ("is" for singular, "are" for plural/they)`,
     };
 
     const valueGetters = {
@@ -84,19 +111,20 @@ function createPronounMacroManager() {
     ]);
 
     /** @type {Set<string>} */
-    const wyvernRegistered = new Set();
+    const shorthandRegistered = new Set();
     /** @type {Set<string>} */
     const janitorRegistered = new Set();
 
     // --- Primary macros (always registered) ---
+    // Names match WyvernChat's pronoun placeholder names exactly (camelCase).
     /** @type {Array<{name: string, pronounKey: keyof typeof valueGetters}>} */
     const primaryMacros = [
-        { name: 'pronoun-subjective', pronounKey: 'subjective' },
-        { name: 'pronoun-objective', pronounKey: 'objective' },
-        { name: 'pronoun-pos-det', pronounKey: 'posDet' },
-        { name: 'pronoun-pos-pro', pronounKey: 'posPro' },
-        { name: 'pronoun-reflexive', pronounKey: 'reflexive' },
-        { name: 'pronoun-verb-be', pronounKey: 'verbBe' },
+        { name: 'pronounSubjective', pronounKey: 'subjective' },
+        { name: 'pronounObjective', pronounKey: 'objective' },
+        { name: 'pronounPosDet', pronounKey: 'posDet' },
+        { name: 'pronounPosPro', pronounKey: 'posPro' },
+        { name: 'pronounReflexive', pronounKey: 'reflexive' },
+        { name: 'pronounVerbBe', pronounKey: 'verbBe' },
     ];
 
     for (const { name, pronounKey } of primaryMacros) {
@@ -133,24 +161,6 @@ function createPronounMacroManager() {
             }
         }
 
-        // Register contraction shorthand alongside the main WyvernChat aliases.
-        // {{they_re}} is generic: produces "she's", "he's", "they're", etc. based on verb-be form.
-        // Only added when enabling the wyvern list (not on repeat calls).
-        if (aliasList === wyvernShorthandAliases && !macros.registry.hasMacro('they_re')) {
-            const theyReHandler = () => {
-                const subj = getCurrentPronounValues().subjective;
-                const verb = getVerbBe();
-                if (!subj || !verb) return '';
-                return verb === 'are' ? `${subj}'re` : `${subj}'s`;
-            };
-            macros.registry.registerMacro('they_re', {
-                category: 'legacy',
-                description: t`Contraction of subjective + verb-be (e.g. "they're", "she's", "he's")`,
-                handler: theyReHandler,
-            });
-            macrosByType.get('verbBe').add('they_re');
-            registeredSet.add('they_re');
-        }
     }
 
     /**
@@ -177,11 +187,11 @@ function createPronounMacroManager() {
     }
 
     return {
-        wyvernAliases: {
-            enable: () => enableAliasGroup(wyvernShorthandAliases, wyvernRegistered),
-            disable: () => disableAliasGroup(wyvernRegistered),
-            toggle: () => wyvernRegistered.size > 0 ? disableAliasGroup(wyvernRegistered) : enableAliasGroup(wyvernShorthandAliases, wyvernRegistered),
-            set: (enabled) => setAliasGroup(wyvernRegistered, wyvernShorthandAliases, enabled),
+        shorthands: {
+            enable: () => enableAliasGroup(shorthandAliases, shorthandRegistered),
+            disable: () => disableAliasGroup(shorthandRegistered),
+            toggle: () => shorthandRegistered.size > 0 ? disableAliasGroup(shorthandRegistered) : enableAliasGroup(shorthandAliases, shorthandRegistered),
+            set: (enabled) => setAliasGroup(shorthandRegistered, shorthandAliases, enabled),
         },
         janitorAliases: {
             enable: () => enableAliasGroup(janitorShorthandAliases, janitorRegistered),
@@ -206,6 +216,6 @@ function createPronounMacroManager() {
  */
 export function applyMacroSettings() {
     const m = getMacroManager();
-    m.wyvernAliases.set(pronounsSettings.wyvernShorthands);
+    m.shorthands.set(pronounsSettings.shorthands);
     m.janitorAliases.set(pronounsSettings.janitorShorthands);
 }

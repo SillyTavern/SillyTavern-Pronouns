@@ -1,6 +1,6 @@
 import { injectUI, registerEventListeners, refreshPronounInputs } from './src/ui.js';
 import { ensureSettings } from './src/pronouns.js';
-import { applyMacroSettings } from './src/macros.js';
+import { applyMacroSettings, registerPreProcessors } from './src/macros.js';
 import { registerSlashCommands } from './src/slash-commands.js';
 
 export const EXTENSION_KEY = 'sillytavern-pronouns';
@@ -23,6 +23,7 @@ export async function init() {
     await injectUI();
     registerEventListeners();
 
+    registerPreProcessors();
     applyMacroSettings();
     refreshPronounInputs();
 

@@ -35,9 +35,9 @@ export const pronounPresets = {
 
 /** @typedef {{ pronounKey: 'subjective'|'objective'|'posDet'|'posPro'|'reflexive'; names: string[] }} PronounShorthandAlias */
 
-/** WyvernChat-style shorthands (she/her/his_ etc.) */
+/** Readability shorthands (she/her/his_ etc.) — language-neutral names for common English pronouns. */
 /** @type {ReadonlyArray<PronounShorthandAlias>} */
-export const wyvernShorthandAliases = Object.freeze([
+export const shorthandAliases = Object.freeze([
     { pronounKey: 'subjective', names: ['she', 'he', 'they'] },
     { pronounKey: 'objective', names: ['her', 'him', 'them'] },
     { pronounKey: 'posDet', names: ['her_', 'his_', 'their_'] },
@@ -45,12 +45,16 @@ export const wyvernShorthandAliases = Object.freeze([
     { pronounKey: 'reflexive', names: ['herself', 'himself', 'themself'] },
 ]);
 
-/** JanitorAI-style shorthands (sub/obj/poss etc.) */
+/**
+ * JanitorAI-style shorthands.
+ * Names confirmed from JanitorAI UI: sub, obj, pos, poss_p, ref.
+ * Note: possessive determiner is {{pos}} (not {{poss}}) on JanitorAI.
+ */
 /** @type {ReadonlyArray<PronounShorthandAlias>} */
 export const janitorShorthandAliases = Object.freeze([
     { pronounKey: 'subjective', names: ['sub'] },
     { pronounKey: 'objective', names: ['obj'] },
-    { pronounKey: 'posDet', names: ['poss'] },
+    { pronounKey: 'posDet', names: ['pos'] },
     { pronounKey: 'posPro', names: ['poss_p'] },
     { pronounKey: 'reflexive', names: ['ref'] },
 ]);
@@ -60,24 +64,30 @@ export const janitorShorthandAliases = Object.freeze([
 // ---------------------------------------------------------------------------
 
 export const settingKeys = Object.freeze({
-    ENABLE_WYVERN_SHORTHANDS: 'enableWyvernShorthands',
+    ENABLE_SHORTHANDS: 'enableShorthands',
     ENABLE_JANITOR_SHORTHANDS: 'enableJanitorShorthands',
 });
 
 const defaultSettings = Object.freeze({
-    [settingKeys.ENABLE_WYVERN_SHORTHANDS]: false,
+    [settingKeys.ENABLE_SHORTHANDS]: false,
     [settingKeys.ENABLE_JANITOR_SHORTHANDS]: false,
 });
 
 /**
- * Migrates settings from v1 to v2 if needed.
- * - v1 had a single `enablePersonaShorthands` key which mapped to WyvernChat shorthands.
+ * Migrates settings from older versions if needed.
+ * - v1 had a single `enablePersonaShorthands` key.
+ * - v2.0 used `enableWyvernShorthands`.
+ * Both map to the current `enableShorthands` key.
  * @param {Record<string, unknown>} settings
  */
 function migrateSettings(settings) {
-    if ('enablePersonaShorthands' in settings && !(settingKeys.ENABLE_WYVERN_SHORTHANDS in settings)) {
-        settings[settingKeys.ENABLE_WYVERN_SHORTHANDS] = settings['enablePersonaShorthands'];
+    if ('enablePersonaShorthands' in settings && !(settingKeys.ENABLE_SHORTHANDS in settings)) {
+        settings[settingKeys.ENABLE_SHORTHANDS] = settings['enablePersonaShorthands'];
         delete settings['enablePersonaShorthands'];
+    }
+    if ('enableWyvernShorthands' in settings && !(settingKeys.ENABLE_SHORTHANDS in settings)) {
+        settings[settingKeys.ENABLE_SHORTHANDS] = settings['enableWyvernShorthands'];
+        delete settings['enableWyvernShorthands'];
     }
 }
 
@@ -96,8 +106,8 @@ export function ensureSettings() {
 }
 
 export const pronounsSettings = {
-    get wyvernShorthands() {
-        return Boolean(ensureSettings()[settingKeys.ENABLE_WYVERN_SHORTHANDS]);
+    get shorthands() {
+        return Boolean(ensureSettings()[settingKeys.ENABLE_SHORTHANDS]);
     },
     get janitorShorthands() {
         return Boolean(ensureSettings()[settingKeys.ENABLE_JANITOR_SHORTHANDS]);

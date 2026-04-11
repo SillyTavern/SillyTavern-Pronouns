@@ -36,33 +36,40 @@ Pronouns are available as macros anywhere SillyTavern supports macro substitutio
 
 **Primary macros** (always available):
 
+These names match WyvernChat's pronoun placeholder names exactly.
+
 | Macro | Pronoun type | Example values |
 |---|---|---|
-| `{{pronoun-subjective}}` | Subjective | she / he / they |
-| `{{pronoun-objective}}` | Objective | her / him / them |
-| `{{pronoun-pos-det}}` | Possessive determiner | her / his / their |
-| `{{pronoun-pos-pro}}` | Possessive pronoun | hers / his / theirs |
-| `{{pronoun-reflexive}}` | Reflexive | herself / himself / themselves |
-| `{{pronoun-verb-be}}` | Verb-be agreement | is / are |
+| `{{pronounSubjective}}` | Subjective | she / he / they |
+| `{{pronounObjective}}` | Objective | her / him / them |
+| `{{pronounPosDet}}` | Possessive determiner | her / his / their |
+| `{{pronounPosPro}}` | Possessive pronoun | hers / his / theirs |
+| `{{pronounReflexive}}` | Reflexive | herself / himself / themselves |
+| `{{pronounVerbBe}}` | Verb-be agreement (English) | is / are |
 
-**WyvernChat shorthand aliases** (opt-in, see [Settings](#settings)):
+WyvernChat dot-notation (`{{pronoun.subjective}}` etc.) is automatically rewritten to the camelCase form above.
+
+**Shorthand aliases** (opt-in, see [Settings](#settings)):
+
+English pronoun words as macros — makes prompts easier to read and write at authoring time.
 
 | Macros | Pronoun type |
 |---|---|
 | `{{she}}` `{{he}}` `{{they}}` | Subjective |
 | `{{her}}` `{{him}}` `{{them}}` | Objective |
-| `{{her_}}` `{{his_}}` `{{their_}}` | Possessive determiner (trailing `_` avoids collision) |
+| `{{her_}}` `{{his_}}` `{{their_}}` | Possessive determiner (trailing `_` avoids collision with `{{her}}`) |
 | `{{hers}}` `{{his}}` `{{theirs}}` | Possessive pronoun |
 | `{{herself}}` `{{himself}}` `{{themself}}` | Reflexive |
-| `{{they_re}}` | Subjective + verb-be contraction ("she's", "he's", "they're") |
 
-**JanitorAI shorthand aliases** (opt-in, see [Settings](#settings)):
+**JanitorAI compatibility macros** (opt-in, see [Settings](#settings)):
 
-| Macros | Pronoun type |
+Enable these to use character cards written for the JanitorAI platform.
+
+| Macro | Pronoun type |
 |---|---|
 | `{{sub}}` | Subjective |
 | `{{obj}}` | Objective |
-| `{{poss}}` | Possessive determiner |
+| `{{pos}}` | Possessive determiner |
 | `{{poss_p}}` | Possessive pronoun |
 | `{{ref}}` | Reflexive |
 
@@ -70,7 +77,7 @@ Pronouns are available as macros anywhere SillyTavern supports macro substitutio
 
 Accessible via **Extensions → Pronouns → Open pronoun replacer**.
 
-Paste any prompt or character card text and the tool automatically swaps matching pronoun words with the correct macros for your active persona. Supports WyvernChat shorthand macros if enabled.
+Paste any prompt or character card text and the tool automatically swaps matching pronoun words with the correct macros for your active persona. Supports shorthand macros if enabled.
 
 ### Slash Commands
 
@@ -85,8 +92,8 @@ Paste any prompt or character card text and the tool automatically swaps matchin
 
 Access the extension settings under **Extensions → Pronouns** in the SillyTavern settings panel.
 
-- **Enable WyvernChat shorthand macros** — Registers `{{she}}`, `{{him}}`, `{{their_}}`, `{{they_re}}`, etc. as additional aliases. Disabled by default to keep the macro list clean.
-- **Enable JanitorAI shorthand macros** — Registers `{{sub}}`, `{{obj}}`, `{{poss}}`, etc. as additional aliases. Disabled by default.
+- **Enable shorthand macros** — Registers `{{she}}`, `{{him}}`, `{{their_}}`, etc. as additional aliases. Makes prompts easier to read and write. Disabled by default.
+- **Enable JanitorAI compatibility macros** — Registers `{{sub}}`, `{{obj}}`, `{{pos}}`, `{{poss_p}}`, `{{ref}}`. Enable to use cards written for JanitorAI. Disabled by default.
 
 ### Terminology
 
@@ -104,13 +111,13 @@ For more information, see [pronouns.org](https://pronouns.org/) or [Wikipedia](h
 
 - [x] Pronoun editor under Persona Management
 - [x] Quick preset buttons (She/Her, He/Him, They/Them, It/Its)
-- [x] Primary `{{pronoun-*}}` macros always available
-- [x] WyvernChat shorthand macros behind opt-in toggle
-- [x] JanitorAI shorthand macros behind opt-in toggle
+- [x] Primary `{{pronounSubjective}}` / `{{pronounObjective}}` / etc. macros (match WyvernChat names)
+- [x] `{{pronounVerbBe}}` macro ("is"/"are") for verb agreement
+- [x] WyvernChat dot-notation (`{{pronoun.subjective}}` etc.) rewritten automatically via pre-processor
+- [x] English shorthand macros (`{{she}}`, `{{him}}`, etc.) behind opt-in toggle
+- [x] JanitorAI compatibility macros (`{{sub}}`, `{{pos}}`, etc.) behind opt-in toggle
 - [x] Pronoun text replacer popup
 - [x] Slash commands for pronoun management and direct text replacement
-- [x] Add `{{pronoun-verb-be}}` macro ("is"/"are") for verb agreement — e.g., `{{They}} {{pronoun-verb-be}} a student`
-- [x] Add `{{they_re}}` WyvernChat contraction shorthand ("she's"/"he's"/"they're")
 - [ ] Add support for character pronouns (in addition to persona pronouns)
 - [ ] Shorthands in other languages?
 - [ ] add rainbows
