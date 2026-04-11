@@ -8,6 +8,9 @@ Pronoun management for SillyTavern personas. Set pronouns per persona and use th
 
 Inspired by and partially ported from SillyTavern PR [#4542](https://github.com/SillyTavern/SillyTavern/pull/4542).
 
+> [!NOTE]
+> This extension requires the **[Experimental Macro Engine](https://docs.sillytavern.app/usage/core-concepts/macros/#macros)** to be enabled.
+
 ## Installation
 
 Install using SillyTavern's extension installer from the URL:
