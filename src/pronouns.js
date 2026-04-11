@@ -62,14 +62,13 @@ export const wyvernChatAliases = Object.freeze([
 
 /**
  * JanitorAI compatibility aliases.
- * Names confirmed from JanitorAI UI: sub, obj, pos, poss_p, ref.
- * Note: possessive determiner is {{pos}} (not {{poss}}) on JanitorAI.
+ * Names confirmed from JanitorAI UI: sub, obj, poss, poss_p, ref.
  */
 /** @type {ReadonlyArray<PronounShorthandAlias>} */
 export const JanitorAIAliases = Object.freeze([
     { pronounKey: 'subjective', names: ['sub'] },
     { pronounKey: 'objective', names: ['obj'] },
-    { pronounKey: 'posDet', names: ['pos'] },
+    { pronounKey: 'posDet', names: ['poss'] },
     { pronounKey: 'posPro', names: ['poss_p'] },
     { pronounKey: 'reflexive', names: ['ref'] },
 ]);

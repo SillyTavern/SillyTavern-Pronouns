@@ -81,7 +81,7 @@ Access the extension settings under **Extensions → Pronouns** in the SillyTave
 Platform compatibility toggles (only enable if you plan to use character cards from those platforms without manually updating the macros):
 
 - **WyvernChat: capitalized variants** — Registers `{{pronounSubjectiveCap}}`, `{{pronounObjectiveCap}}`, etc. The lowercase variants and dot-notation are always available without this toggle.
-- **JanitorAI: compatibility macros** — Registers `{{sub}}`, `{{obj}}`, `{{pos}}`, `{{poss_p}}`, `{{ref}}`.
+- **JanitorAI: compatibility macros** — Registers `{{sub}}`, `{{obj}}`, `{{poss}}`, `{{poss_p}}`, `{{ref}}`.
 
 ### Platform Compatibility
 
@@ -89,7 +89,7 @@ This extension's primary macros (`{{pronounSubjective}}` etc.) use the same name
 
 Additionally, WyvernChat's older dot-notation (`{{pronoun.subjective}}`, `{{pronoun.objective}}`, etc.) is automatically rewritten at runtime — no manual conversion needed.
 
-For cards written specifically for JanitorAI (`{{sub}}`, `{{obj}}`, `{{pos}}`, `{{poss_p}}`, `{{ref}}`), enable the **JanitorAI compatibility macros** toggle in settings.
+For cards written specifically for JanitorAI (`{{sub}}`, `{{obj}}`, `{{poss}}`, `{{poss_p}}`, `{{ref}}`), enable the **JanitorAI compatibility macros** toggle in settings.
 
 ### Terminology
 
