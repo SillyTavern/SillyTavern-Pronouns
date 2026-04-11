@@ -15,7 +15,7 @@
 
 import { macros } from '../../../../../scripts/macros/macro-system.js';
 import { t } from '../../../../../scripts/i18n.js';
-import { getCurrentPronounValues, shorthandAliases, janitorShorthandAliases, pronounsSettings } from './pronouns.js';
+import { getCurrentPronounValues, shorthandAliases, wyvernCapMacros, janitorShorthandAliases, pronounsSettings } from './pronouns.js';
 
 /**
  * Rewrites WyvernChat dot-notation pronoun placeholders to our camelCase macro names.
@@ -61,6 +61,7 @@ function getVerbBe() {
  * @property {() => string[]} getRegistered
  * @property {() => { subjective: string[]; objective: string[]; posDet: string[]; posPro: string[]; reflexive: string[]; verbBe: string[] }} getRegisteredByType
  * @property {{ toggle: () => void, set: (enabled: boolean) => void, enable: () => void, disable: () => void }} shorthands
+ * @property {{ toggle: () => void, set: (enabled: boolean) => void, enable: () => void, disable: () => void }} wyvernCompat
  * @property {{ toggle: () => void, set: (enabled: boolean) => void, enable: () => void, disable: () => void }} janitorAliases
  */
 
@@ -113,6 +114,8 @@ function createPronounMacroManager() {
     /** @type {Set<string>} */
     const shorthandRegistered = new Set();
     /** @type {Set<string>} */
+    const wyvernCompatRegistered = new Set();
+    /** @type {Set<string>} */
     const janitorRegistered = new Set();
 
     // --- Primary macros (always registered) ---
@@ -164,6 +167,28 @@ function createPronounMacroManager() {
     }
 
     /**
+     * Registers the WyvernChat capitalized macro variants.
+     * These return the primary value with the first letter uppercased.
+     * @param {Set<string>} registeredSet
+     */
+    function enableWyvernCompatGroup(registeredSet) {
+        for (const { pronounKey, name } of wyvernCapMacros) {
+            if (macros.registry.hasMacro(name)) continue;
+            const getter = valueGetters[pronounKey];
+            macros.registry.registerMacro(name, {
+                category: 'legacy',
+                description: descriptions[pronounKey],
+                handler: () => {
+                    const v = getter();
+                    return v ? v.charAt(0).toUpperCase() + v.slice(1) : '';
+                },
+            });
+            macrosByType.get(pronounKey).add(name);
+            registeredSet.add(name);
+        }
+    }
+
+    /**
      * Unregisters all macros in a registered set.
      * @param {Set<string>} registeredSet
      */
@@ -193,6 +218,12 @@ function createPronounMacroManager() {
             toggle: () => shorthandRegistered.size > 0 ? disableAliasGroup(shorthandRegistered) : enableAliasGroup(shorthandAliases, shorthandRegistered),
             set: (enabled) => setAliasGroup(shorthandRegistered, shorthandAliases, enabled),
         },
+        wyvernCompat: {
+            enable: () => enableWyvernCompatGroup(wyvernCompatRegistered),
+            disable: () => disableAliasGroup(wyvernCompatRegistered),
+            toggle: () => wyvernCompatRegistered.size > 0 ? disableAliasGroup(wyvernCompatRegistered) : enableWyvernCompatGroup(wyvernCompatRegistered),
+            set: (enabled) => enabled ? enableWyvernCompatGroup(wyvernCompatRegistered) : disableAliasGroup(wyvernCompatRegistered),
+        },
         janitorAliases: {
             enable: () => enableAliasGroup(janitorShorthandAliases, janitorRegistered),
             disable: () => disableAliasGroup(janitorRegistered),
@@ -217,5 +248,6 @@ function createPronounMacroManager() {
 export function applyMacroSettings() {
     const m = getMacroManager();
     m.shorthands.set(pronounsSettings.shorthands);
+    m.wyvernCompat.set(pronounsSettings.wyvernCompat);
     m.janitorAliases.set(pronounsSettings.janitorShorthands);
 }

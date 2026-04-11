@@ -11,14 +11,23 @@
                     <span title="Enables English pronoun shorthand macros like &lbrace;&lbrace;she&rbrace;&rbrace;, &lbrace;&lbrace;him&rbrace;&rbrace;, &lbrace;&lbrace;their_&rbrace;&rbrace;, etc. Makes prompts easier to read and write."
                         data-i18n="Enable shorthand macros">Enable shorthand macros</span>
                 </label>
-                <label class="checkbox_label" for="pronouns_enable_janitor_shorthands">
-                    <input type="checkbox" id="pronouns_enable_janitor_shorthands" />
-                    <span title="Enables JanitorAI-compatible pronoun macros: &lbrace;&lbrace;sub&rbrace;&rbrace;, &lbrace;&lbrace;obj&rbrace;&rbrace;, &lbrace;&lbrace;pos&rbrace;&rbrace;, &lbrace;&lbrace;poss_p&rbrace;&rbrace;, &lbrace;&lbrace;ref&rbrace;&rbrace;. Enable this to use cards written for JanitorAI."
-                        data-i18n="Enable JanitorAI compatibility macros">Enable JanitorAI compatibility macros</span>
-                </label>
                 <div class="flex-container" style="margin-top: 8px;">
                     <div id="pronouns_open_replacer" class="menu_button" data-i18n="Open pronoun replacer">Open pronoun replacer</div>
                 </div>
+                <hr style="width: 100%; margin: 8px 0;" />
+                <small data-i18n="Only enable the compatibility macros below if you plan to use character cards from those platforms without manually updating the pronoun macros. They add extra macro names that may clutter the macro list.">
+                    Only enable the compatibility macros below if you plan to use character cards from those platforms without manually updating the pronoun macros. They add extra macro names that may clutter the macro list.
+                </small>
+                <label class="checkbox_label" for="pronouns_enable_wyvern_compat">
+                    <input type="checkbox" id="pronouns_enable_wyvern_compat" />
+                    <span title="Enables WyvernChat capitalized pronoun macros: &lbrace;&lbrace;pronounSubjectiveCap&rbrace;&rbrace;, &lbrace;&lbrace;pronounObjectiveCap&rbrace;&rbrace;, etc. The lowercase variants (&lbrace;&lbrace;pronounSubjective&rbrace;&rbrace; etc.) and dot-notation (&lbrace;&lbrace;pronoun.subjective&rbrace;&rbrace; etc.) are always available without this toggle."
+                        data-i18n="WyvernChat: capitalized variants">WyvernChat: capitalized variants</span>
+                </label>
+                <label class="checkbox_label" for="pronouns_enable_janitor_shorthands">
+                    <input type="checkbox" id="pronouns_enable_janitor_shorthands" />
+                    <span title="Enables JanitorAI-compatible pronoun macros: &lbrace;&lbrace;sub&rbrace;&rbrace;, &lbrace;&lbrace;obj&rbrace;&rbrace;, &lbrace;&lbrace;pos&rbrace;&rbrace;, &lbrace;&lbrace;poss_p&rbrace;&rbrace;, &lbrace;&lbrace;ref&rbrace;&rbrace;. Enable this to use cards written for JanitorAI without modifying them."
+                        data-i18n="JanitorAI: compatibility macros">JanitorAI: compatibility macros</span>
+                </label>
             </div>
         </div>
     </div>

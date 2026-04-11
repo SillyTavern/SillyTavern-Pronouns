@@ -46,6 +46,21 @@ export const shorthandAliases = Object.freeze([
 ]);
 
 /**
+ * WyvernChat capitalized macro variants.
+ * These are aliases that return the same value as the primary macros but capitalized.
+ * WyvernChat exposes these as {{pronounSubjectiveCap}} etc.
+ * We implement them as separate handlers (not aliases) since they transform the value.
+ */
+/** @type {ReadonlyArray<{pronounKey: 'subjective'|'objective'|'posDet'|'posPro'|'reflexive', name: string}>} */
+export const wyvernCapMacros = Object.freeze([
+    { pronounKey: 'subjective', name: 'pronounSubjectiveCap' },
+    { pronounKey: 'objective', name: 'pronounObjectiveCap' },
+    { pronounKey: 'posDet', name: 'pronounPosDetCap' },
+    { pronounKey: 'posPro', name: 'pronounPosProCap' },
+    { pronounKey: 'reflexive', name: 'pronounReflexiveCap' },
+]);
+
+/**
  * JanitorAI-style shorthands.
  * Names confirmed from JanitorAI UI: sub, obj, pos, poss_p, ref.
  * Note: possessive determiner is {{pos}} (not {{poss}}) on JanitorAI.
@@ -65,11 +80,13 @@ export const janitorShorthandAliases = Object.freeze([
 
 export const settingKeys = Object.freeze({
     ENABLE_SHORTHANDS: 'enableShorthands',
+    ENABLE_WYVERN_COMPAT: 'enableWyvernCompat',
     ENABLE_JANITOR_SHORTHANDS: 'enableJanitorShorthands',
 });
 
 const defaultSettings = Object.freeze({
     [settingKeys.ENABLE_SHORTHANDS]: false,
+    [settingKeys.ENABLE_WYVERN_COMPAT]: false,
     [settingKeys.ENABLE_JANITOR_SHORTHANDS]: false,
 });
 
@@ -108,6 +125,9 @@ export function ensureSettings() {
 export const pronounsSettings = {
     get shorthands() {
         return Boolean(ensureSettings()[settingKeys.ENABLE_SHORTHANDS]);
+    },
+    get wyvernCompat() {
+        return Boolean(ensureSettings()[settingKeys.ENABLE_WYVERN_COMPAT]);
     },
     get janitorShorthands() {
         return Boolean(ensureSettings()[settingKeys.ENABLE_JANITOR_SHORTHANDS]);

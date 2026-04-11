@@ -101,7 +101,7 @@ export function registerSlashCommands() {
                 for (const k of ['subjective', 'objective', 'posDet', 'posPro', 'reflexive']) {
                     if (typeof args[k] === 'string') pronouns[k] = args[k];
                 }
-                return replacePronounsWithMacros(String(text ?? ''), { useWyvernShorthands: useSh, pronouns }) || '';
+                return replacePronounsWithMacros(String(text ?? ''), { useShorthands: useSh, pronouns }) || '';
             } catch (error) {
                 toastr.error(String(error?.message ?? error), 'Pronouns');
                 return '';

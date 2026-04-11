@@ -6,7 +6,7 @@
 import { t } from '../../../../../scripts/i18n.js';
 import { Popup, POPUP_TYPE, POPUP_RESULT } from '../../../../../scripts/popup.js';
 import { escapeHtml } from '../../../../utils.js';
-import { getCurrentPronounValues, pronounsSettings, wyvernShorthandAliases } from './pronouns.js';
+import { getCurrentPronounValues, pronounsSettings, shorthandAliases } from './pronouns.js';
 
 /** @typedef {{ subjective: string, objective: string, posDet: string, posPro: string, reflexive: string }} Pronouns */
 
@@ -31,47 +31,55 @@ function arePronounsEmpty(p) {
 }
 
 /**
- * Returns the primary macro name for a given pronoun key.
+ * Returns the primary (camelCase) macro name for a given pronoun key.
  * @param {'subjective'|'objective'|'posDet'|'posPro'|'reflexive'} key
  * @returns {string}
  */
 function getPrimaryMacroName(key) {
     const map = {
-        subjective: 'pronoun-subjective',
-        objective: 'pronoun-objective',
-        posDet: 'pronoun-pos-det',
-        posPro: 'pronoun-pos-pro',
-        reflexive: 'pronoun-reflexive',
+        subjective: 'pronounSubjective',
+        objective: 'pronounObjective',
+        posDet: 'pronounPosDet',
+        posPro: 'pronounPosPro',
+        reflexive: 'pronounReflexive',
     };
-    return map[key] ?? `pronoun-${key}`;
+    return map[key] ?? `pronounSubjective`;
 }
 
 /**
- * Selects a WyvernChat shorthand alias name that matches the current pronoun value.
- * Falls back to null if no matching alias is available.
+ * Selects the best shorthand macro name for a given pronoun key and its current value.
+ * Matches by checking whether any shorthand alias name starts with the same letters as the value.
+ * Falls back to null if no match is found.
+ *
+ * Example: pronounKey='objective', value='her' → 'her'
+ *          pronounKey='objective', value='him' → 'him'
+ *          pronounKey='posDet', value='her'    → 'her_' (trailing _ to disambiguate from objective 'her')
+ *
  * @param {'subjective'|'objective'|'posDet'|'posPro'|'reflexive'} pronounKey
  * @param {string} value
  * @returns {string|null}
  */
-function pickMatchingWyvernAlias(pronounKey, value) {
-    const aliases = wyvernShorthandAliases.find(a => a.pronounKey === pronounKey)?.names ?? [];
+function pickShorthandAlias(pronounKey, value) {
+    const group = shorthandAliases.find(a => a.pronounKey === pronounKey);
+    if (!group) return null;
     const lower = String(value || '').toLowerCase();
-    return aliases.find(name => name.toLowerCase().startsWith(lower)) ?? null;
+    // Find the alias whose base (without trailing _) matches the value
+    return group.names.find(name => name.replace(/_$/, '').toLowerCase() === lower) ?? null;
 }
 
 /**
  * Converts direct pronoun words in the provided text into macros.
- * Uses WyvernChat shorthand macros if globally enabled and a matching alias exists.
+ * Uses shorthand macro names if `useShorthands` is true and a matching alias exists.
  *
  * Ambiguities are resolved by precedence: reflexive > possessive pronoun > objective > possessive determiner > subjective.
  *
  * @param {string} text - Input text to convert
  * @param {Object} [options={}]
- * @param {boolean} [options.useWyvernShorthands=false] - Whether to prefer WyvernChat shorthand macro names
+ * @param {boolean} [options.useShorthands=false] - Whether to prefer shorthand macro names (e.g. {{she}}, {{him}})
  * @param {Pronouns} [options.pronouns=null] - Override pronouns (defaults to current persona)
  * @returns {string}
  */
-export function replacePronounsWithMacros(text, { useWyvernShorthands = false, pronouns: pronounsOverride = null } = {}) {
+export function replacePronounsWithMacros(text, { useShorthands = false, pronouns: pronounsOverride = null } = {}) {
     if (!text) return '';
 
     const pronouns = pronounsOverride ?? getCurrentPronounValues();
@@ -99,12 +107,11 @@ export function replacePronounsWithMacros(text, { useWyvernShorthands = false, p
         const lower = v.toLowerCase();
         if (lowerWordToMacro.has(lower)) return; // keep first by precedence
 
-        let macroName = null;
-        if (useWyvernShorthands && pronounsSettings.wyvernShorthands) {
-            const alias = pickMatchingWyvernAlias(key, v);
+        let macroName = getPrimaryMacroName(key);
+        if (useShorthands) {
+            const alias = pickShorthandAlias(key, v);
             if (alias) macroName = alias;
         }
-        if (!macroName) macroName = getPrimaryMacroName(key);
         lowerWordToMacro.set(lower, `{{${macroName}}}`);
     }
 
@@ -172,7 +179,7 @@ async function copyToClipboard(text) {
  * @returns {Promise<string>}
  */
 export async function openPronounReplacePopup(initialText = null, { defaultUseShorthands = true } = {}) {
-    const showShorthandToggle = pronounsSettings.wyvernShorthands;
+    const shorthandsGloballyEnabled = pronounsSettings.shorthands;
 
     const pronouns = getCurrentPronounValues();
     if (arePronounsEmpty(pronouns)) {
@@ -197,8 +204,8 @@ export async function openPronounReplacePopup(initialText = null, { defaultUseSh
      * @returns {string}
      */
     function buildRow(key, label, value, useShorthands) {
-        const alias = pickMatchingWyvernAlias(key, value);
-        const macroName = alias && useShorthands ? alias : getPrimaryMacroName(key);
+        const alias = useShorthands ? pickShorthandAlias(key, value) : null;
+        const macroName = alias ?? getPrimaryMacroName(key);
         return `<tr><td>${label}</td><td>${escapeHtml(value)}</td><td>→</td><td>${escapeHtml(`{{${macroName}}}`)}</td></tr>`;
     }
 
@@ -212,7 +219,7 @@ export async function openPronounReplacePopup(initialText = null, { defaultUseSh
             { key: 'posPro', label: t`Possessive pronoun` },
             { key: 'reflexive', label: t`Reflexive` },
         ];
-        const useShorthands = showShorthandToggle && (getShorthandsCheckbox()?.checked ?? defaultUseShorthands);
+        const useShorthands = shorthandsGloballyEnabled && (getShorthandsCheckbox()?.checked ?? defaultUseShorthands);
         return order
             .map(({ key, label }) => {
                 const value = String(pronouns[key] ?? '').trim();
@@ -226,7 +233,6 @@ export async function openPronounReplacePopup(initialText = null, { defaultUseSh
     const content = `
         <h3>${t`Pronoun Replacer`}</h3>
         <p>${t`This tool converts direct pronoun words into macros for your current persona.`}</p>
-        <p>${t`It supports WyvernChat shorthand macros if enabled.`}</p>
         <table class="pronoun-replacer-table">
             <thead>
                 <tr><th>${t`Pronoun`}</th><th>${t`Value`}</th><th></th><th>${t`Macro`}</th></tr>
@@ -241,12 +247,15 @@ export async function openPronounReplacePopup(initialText = null, { defaultUseSh
         okButton: t`Convert & Copy`,
         cancelButton: t`Close`,
         rows: 8,
-        customInputs: showShorthandToggle ? [{
+        customInputs: [{
             id: 'pronouns_replace_use_shorthands',
-            label: t`Use WyvernChat shorthand macros (e.g. {{she}}, {{him}})`,
-            tooltip: t`If enabled, uses WyvernChat shorthand macro names where available. Falls back to full macros otherwise.`,
-            defaultState: Boolean(defaultUseShorthands),
-        }] : null,
+            label: t`Use shorthand macros (e.g. {{she}}, {{him}})`,
+            tooltip: shorthandsGloballyEnabled
+                ? t`Uses shorthand macro names where available (e.g. {{she}} instead of {{pronounSubjective}}).`
+                : t`Enable shorthand macros in Settings → Pronouns to use this option.`,
+            defaultState: shorthandsGloballyEnabled && Boolean(defaultUseShorthands),
+            disabled: !shorthandsGloballyEnabled,
+        }],
         customButtons: [
             {
                 text: t`Paste`,
@@ -261,8 +270,8 @@ export async function openPronounReplacePopup(initialText = null, { defaultUseSh
                 classes: ['secondary'],
                 action: async () => {
                     const checkbox = getShorthandsCheckbox();
-                    const useSh = checkbox ? checkbox.checked : true;
-                    const converted = replacePronounsWithMacros(String(popup.mainInput.value ?? ''), { useWyvernShorthands: useSh });
+                    const useSh = shorthandsGloballyEnabled && (checkbox ? checkbox.checked : false);
+                    const converted = replacePronounsWithMacros(String(popup.mainInput.value ?? ''), { useShorthands: useSh });
                     popup.mainInput.value = converted;
                     toastr.success(t`Converted`);
                 },
@@ -284,8 +293,8 @@ export async function openPronounReplacePopup(initialText = null, { defaultUseSh
         },
         onClosing: async (p) => {
             if (p.result >= POPUP_RESULT.AFFIRMATIVE) {
-                const useSh = Boolean(p.inputResults?.get('pronouns_replace_use_shorthands') ?? true);
-                const converted = replacePronounsWithMacros(String(p.value ?? ''), { useWyvernShorthands: useSh });
+                const useSh = shorthandsGloballyEnabled && Boolean(p.inputResults?.get('pronouns_replace_use_shorthands') ?? false);
+                const converted = replacePronounsWithMacros(String(p.value ?? ''), { useShorthands: useSh });
                 const ok = await copyToClipboard(converted);
                 if (ok) toastr.success(t`Converted and copied`);
                 p.value = converted;

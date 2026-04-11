@@ -114,6 +114,13 @@ function onShorthandsToggleChange(event) {
     updatePronounTooltips();
 }
 
+function onWyvernCompatToggleChange(event) {
+    const enabled = $(event.currentTarget).is(':checked');
+    saveSetting(settingKeys.ENABLE_WYVERN_COMPAT, enabled);
+    getMacroManager().wyvernCompat.set(enabled);
+    updatePronounTooltips();
+}
+
 function onJanitorToggleChange(event) {
     const enabled = $(event.currentTarget).is(':checked');
     saveSetting(settingKeys.ENABLE_JANITOR_SHORTHANDS, enabled);
@@ -158,6 +165,10 @@ async function injectSettingsUI() {
     $('#pronouns_enable_shorthands')
         .prop('checked', pronounsSettings.shorthands)
         .on('change', onShorthandsToggleChange);
+
+    $('#pronouns_enable_wyvern_compat')
+        .prop('checked', pronounsSettings.wyvernCompat)
+        .on('change', onWyvernCompatToggleChange);
 
     $('#pronouns_enable_janitor_shorthands')
         .prop('checked', pronounsSettings.janitorShorthands)
