@@ -1,5 +1,5 @@
-import { injectUI, registerEventListeners, refreshPronounInputs } from './src/ui.js';
-import { ensureSettings } from './src/pronouns.js';
+import { injectUI, registerEventListeners as registerUIEventListeners, refreshPronounInputs } from './src/ui.js';
+import { ensureSettings, cleanAllPronounData, registerDataEventListeners } from './src/pronouns.js';
 import { applyMacroSettings, registerPreProcessors } from './src/macros.js';
 import { registerSlashCommands } from './src/slash-commands.js';
 import { event_types, eventSource } from '/script.js';
@@ -25,8 +25,10 @@ export async function init() {
     const version = SillyTavern.getContext().getExtensionManifest?.(EXTENSION_NAME)?.version ?? null;
     ensureSettings(version);
 
+    registerDataEventListeners();
+
     await injectUI();
-    registerEventListeners();
+    registerUIEventListeners();
 
     registerPreProcessors();
     applyMacroSettings();
@@ -39,6 +41,15 @@ export async function init() {
     console.debug(`[${EXTENSION_NAME}] Extension activated`);
 
     initialized = true;
+}
+
+/**
+ * Extension clean hook — called when the extension is uninstalled.
+ */
+export async function clean() {
+    console.debug(`[${EXTENSION_NAME}] Running clean hook...`);
+    await cleanAllPronounData();
+    console.debug(`[${EXTENSION_NAME}] Clean complete.`);
 }
 
 // TODO: This function is needed as long as the experimental macro engine can be off

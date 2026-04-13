@@ -2,7 +2,7 @@
  * Core pronoun data, persona state management, and settings for the Pronouns extension.
  */
 
-import { saveSettingsDebounced, user_avatar } from '../../../../../script.js';
+import { saveSettingsDebounced, saveSettings, user_avatar, eventSource, event_types } from '../../../../../script.js';
 import { power_user } from '../../../../../scripts/power-user.js';
 import { extension_settings } from '../../../../extensions.js';
 import { EXTENSION_KEY } from '../index.js';
@@ -256,4 +256,51 @@ export function applyPronounPreset(presetKey) {
     const preset = pronounPresets[presetKey];
     if (!preset) return getCurrentPronounValues();
     return setCurrentPronounValues(preset);
+}
+
+/**
+ * Copies the pronoun data from one persona to another.
+ * No-op if the source persona has no pronouns set.
+ * @param {string} sourceAvatarId
+ * @param {string} targetAvatarId
+ */
+export function copyPronounData(sourceAvatarId, targetAvatarId) {
+    const source = power_user.persona_descriptions?.[sourceAvatarId];
+    if (!source?.pronoun) return;
+
+    power_user.persona_descriptions[targetAvatarId] = power_user.persona_descriptions[targetAvatarId] ?? {};
+    power_user.persona_descriptions[targetAvatarId].pronoun = { ...source.pronoun };
+    saveSettingsDebounced();
+}
+
+/**
+ * Registers data-layer event listeners for persona lifecycle events.
+ * Call once during extension initialization.
+ */
+export function registerDataEventListeners() {
+    // Copy pronouns when a persona is duplicated (requires ST core PR #5448)
+    eventSource.on(event_types.PERSONA_CREATED, (/** @type {{ avatarId: string, duplicatedFromAvatarId?: string }} */ data) => {
+        if (data?.duplicatedFromAvatarId) {
+            copyPronounData(data.duplicatedFromAvatarId, data.avatarId);
+        }
+    });
+}
+
+/**
+ * Removes all pronoun data added by this extension:
+ *  - The `pronoun` field from every persona descriptor
+ *  - The extension's own settings block
+ * Uses a direct (non-debounced) save so data is persisted before any page reload.
+ */
+export async function cleanAllPronounData() {
+    if (power_user?.persona_descriptions) {
+        for (const descriptor of Object.values(power_user.persona_descriptions)) {
+            if (descriptor && 'pronoun' in descriptor) {
+                delete descriptor.pronoun;
+            }
+        }
+    }
+
+    delete extension_settings[EXTENSION_KEY];
+    await saveSettings(); // non-debounced as this can be critical (on extension uninstall, it needs to happen right away or settings cleanup will not be saved)
 }
