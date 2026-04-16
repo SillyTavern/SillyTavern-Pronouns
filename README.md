@@ -1,7 +1,7 @@
 # SillyTavern Pronouns [Extension]
 
-[![extension version](https://img.shields.io/badge/dynamic/json?color=blue&label=extension%20version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2FWolfsblvt%2FSillyTavern-Pronouns%2Fmain%2Fmanifest.json)](https://github.com/Wolfsblvt/SillyTavern-Pronouns/)
-[![release version](https://img.shields.io/github/release/Wolfsblvt/SillyTavern-Pronouns?color=lightblue&label=release)](https://github.com/Wolfsblvt/SillyTavern-Pronouns/releases/latest)
+[![extension version](https://img.shields.io/badge/dynamic/json?color=blue&label=extension%20version&query=%24.version&url=https%3A%2F%2Fraw.githubusercontent.com%2FSillyTavern%2FSillyTavern-Pronouns%2Fmain%2Fmanifest.json)](https://github.com/SillyTavern/SillyTavern-Pronouns/)
+[![release version](https://img.shields.io/github/release/SillyTavern/SillyTavern-Pronouns?color=lightblue&label=release)](https://github.com/SillyTavern/SillyTavern-Pronouns/releases/latest)
 [![required ST version](https://img.shields.io/badge/required%20ST%20version-1.17.0-darkred?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABRFBMVEVHcEyEGxubFhafFRWfFRWeFBSaFhaWFRWfFRWfFRWOFhaeFRWeFBSeFBSfFRWfFRWdFRWbFBSfFBSfFBSdFRWeExOfFBSfFRWdFBSfFRWfFRWfGxudFRWeFBSTFRWeFRWeFRWfFRWcFhaeFRWfFRWeFRWfFRWfFRWeFRWeFRWeFRWgFBSgFRWfFRWfFRWgFRX26ur4+Pj9+/ugFBT9/v6fFRWtOzueFRWeFRWgFRX///+fFRX6+/vXo6OfFBSrODj6/PzIenr28PD+/f2gFRX06ur17e3dr6+rMzPTlJS5VVW+ZGT9/v7y39/y6OioMTHx//+1Skrrz8+qMDD7+/v7/Pzq0tLkvb22UVHHe3v4+Pi3WFjIgoL4+PjNjIy5XFyuQEDmzMzZpKThubn8/Py+YWHz8/P8/Pz9//+gFRX////36+tJcu2kAAAAaXRSTlMAARDDqIkMB8qyAzqXUrnQGROErSmd1o41pL4iL2oFTFiTHYt5ccZ1PF1G6ONj2/z1gv1n32CkQz/t7ceYYH+KqdZT5fSoY+XbwLSH1u8elxi8+OmeqJ78nTmbXBds8WlWNc+EwcovuYtEjPKpAAACkklEQVQ4y3VTZXfbQBBcwYlZlmSRLdmWmRpwqGFOw1BmPvf/f+/JeU3ipr0Pp/d2VzszO7cAJfj/oXiAxK5xFEU9TkoSxa1pLejggcayrMVNp2lk26w2wEvg4iUry7IATUGVPG12tlfrYB2iWjmPFJjGAxiqwYT5dyEr3MVkoUWZhgTAF0K+JRQfkyrrvhYoYcTWGVEvT/EpF/PudIAKBRTU18LQYswcR1bNiRxv0JXzDjYRzWsiIcuzKgk0OzglkMDVMW4QDiteXu5VJ7dLMBoYMxPxLV0QUk9zRK6SAEIwX+FEL0hTgRGSW00mXXY6Ce8oaw5UETiWokhqN21z9D3RUDMKH0dXo/Ozs/PRwfqbV5UgnNKodtHmydxwOPf+Mr+HJy87rT8ie5kBoLhXw/HXm5uNzf2N4/Hcxu6B6wAYtZiGxgBryNOdi+Xl70ABqsKT8WsKqr7rpAwe1ABhLCDPjT9sj39cX/88QqTgqRm1Yx1ZZAAWhKlPDElZ9vP28szM+HI9L1ADUbSIg061QlTmc252Z+nTTxer27+e5QW82evmdt0bLItvt7a2vn1ZnhTsloAXF++8pznVsu3T4xlyxi/Wqefj/UyibNFSOZq0oGKdERR/JVzd3Ht3eDhC8dHeqhZVGEcRGD2mwHAxbkEJ2Y4CUCmiapHw8lg2IyZh7BrA2bhPZHCJ6OeUFD+HVZRFYnShj21ip5FEEy4VTS1JbUZQeV71b22KEuOBHZzYZ1mx3WRZ3/X/sU2SFRTbbfIHXYyK9YdPnF+cPMlYiO5jTT33UpKbeadspxPLcqwvTNmvz8tyY2mnR+bAYtxnmHoyjdhbYZguxspkHwKZNum/1pcioYW6MJm3Yf5v+02S+Q13BVQ4NCDLNAAAAABJRU5ErkJggg==)](https://github.com/SillyTavern/SillyTavern/releases/tag/1.17.0)
 
 Pronoun management for SillyTavern personas. Set pronouns per persona and use them as macros anywhere in your prompts. Includes a dedicated editor in Persona Management, quick presets, a text replacer tool, and slash commands.
@@ -16,7 +16,7 @@ Inspired by and partially ported from SillyTavern PR [#4542](https://github.com/
 Install using SillyTavern's extension installer from the URL:
 
 ```txt
-https://github.com/Wolfsblvt/SillyTavern-Pronouns
+https://github.com/SillyTavern/SillyTavern-Pronouns
 ```
 
 ## Features
@@ -82,6 +82,13 @@ Platform compatibility toggles (only enable if you plan to use character cards f
 
 - **WyvernChat: capitalized variants** — Registers `{{pronounSubjectiveCap}}`, `{{pronounObjectiveCap}}`, etc. The lowercase variants and dot-notation are always available without this toggle.
 - **JanitorAI: compatibility macros** — Registers `{{sub}}`, `{{obj}}`, `{{poss}}`, `{{poss_p}}`, `{{ref}}`.
+
+### Cleanup Extension Data
+
+> [!NOTE]
+> This feature requires the **staging** branch of SillyTavern.
+
+All extension settings and saved pronouns can be removed via the extensions list or during uninstall.
 
 ### Platform Compatibility
 
